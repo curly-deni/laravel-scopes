@@ -9,7 +9,6 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelScopesServiceProvider extends PackageServiceProvider
 {
-
     protected function registerAbout(): void
     {
         if (! class_exists(InstalledVersions::class) || ! class_exists(AboutCommand::class)) {
