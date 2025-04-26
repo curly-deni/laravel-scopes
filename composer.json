@@ -8,7 +8,6 @@
         "authorization",
         "visibility",
         "model ownership",
-        "public/private status",
         "laravel package"
     ],
     "homepage": "https://github.com/curly-deni/laravel-scopes",
@@ -38,10 +37,7 @@
         "format": "vendor/bin/pint"
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "phpstan/extension-installer": false
-        }
+        "sort-packages": true
     },
     "extra": {
         "laravel": {
