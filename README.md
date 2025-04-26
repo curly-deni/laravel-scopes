@@ -31,14 +31,14 @@ composer require curly-deni/laravel-scopes
 
 ## Usage
 
-All traits are located under the `Aesis\Scopes\Traits` namespace and have the `Has` prefix.
+All traits are located under the `Aesis\Scopes\Traits` namespace.
 
 ### Available traits
 
-- `HasHoldScope` — restricts access to models owned by the current user (`user_id` field required).
+- `HasOwnershipScope` — restricts access to models owned by the current user (`user_id` field required).
 - `HasPublicScope` — restricts access to public models (`public` field required).
 - `HasPrivateScope` — restricts access to private models (`private` field required).
-- `HasOwnScope` — allows users to see their own models in addition to public/private ones (`user_id` field required).
+- `HasSelfScope` — allows users to see their own models in addition to public/private ones (`user_id` field required).
 
 ---
 
@@ -46,14 +46,14 @@ All traits are located under the `Aesis\Scopes\Traits` namespace and have the `H
 
 ### 1. Restrict models to the owner only
 
-Use `HasHoldScope` when users should only see their own models.
+Use `HasOwnershipScope` when users should only see their own models.
 
 ```php
-use Aesis\Scopes\Traits\HasHoldScope;
+use Aesis\Scopes\Traits\HasOwnershipScope;
 
 class Post extends Model
 {
-    use HasHoldScope;
+    use HasOwnershipScope;
 }
 ```
 
@@ -62,15 +62,15 @@ class Post extends Model
 ### 2. Restrict models based on public/private status
 
 Use `HasPublicScope` or `HasPrivateScope` to filter models by their visibility flag.  
-Optionally, add `HasOwnScope` to also allow users to see their own models.
+Optionally, add `HasSelfScope` to also allow users to see their own models.
 
 ```php
 use Aesis\Scopes\Traits\HasPublicScope;
-use Aesis\Scopes\Traits\HasOwnScope;
+use Aesis\Scopes\Traits\HasSelfScope;
 
 class Post extends Model
 {
-    use HasPublicScope, HasOwnScope;
+    use HasPublicScope, HasSelfScope;
 }
 ```
 
@@ -80,11 +80,11 @@ class Post extends Model
 
 | Use Case | Required Traits |
 |:---------|:----------------|
-| Users should see **only their own models** | `HasHoldScope` |
+| Users should see **only their own models** | `HasOwnershipScope` |
 | Users should see **only public models** | `HasPublicScope` |
 | Users should see **only private models** | `HasPrivateScope` |
-| Users should see **public models** and **their own private models** | `HasPublicScope` + `HasOwnScope` |
-| Users should see **private models** and **their own private models** | `HasPrivateScope` + `HasOwnScope` |
+| Users should see **public models** and **their own private models** | `HasPublicScope` + `HasSelfScope` |
+| Users should see **private models** and **their own private models** | `HasPrivateScope` + `HasSelfScope` |
 
 ---
 
@@ -94,8 +94,8 @@ class Post extends Model
 |:------|:---------------|
 | `HasPublicScope` | `public` |
 | `HasPrivateScope` | `private` |
-| `HasHoldScope` | `user_id` |
-| `HasOwnScope` | `user_id` |
+| `HasOwnershipScope` | `user_id` |
+| `HasSelfScope` | `user_id` |
 
 ---
 
@@ -106,7 +106,7 @@ When using scopes, you should define the following permissions in your model pol
 | Method | Purpose |
 |:-------|:--------|
 | `viewPrivate(User $user)` | Allows a user to view **private models** (e.g., admins or users with special roles). |
-| `viewOwned(User $user)` | Allows a user to view **other users' models** (in addition to their own, if `HasOwnScope` is used). |
+| `viewForeign(User $user)` | Allows a user to view **other users' models** (in addition to their own, if `HasSelfScope` is used). |
 
 Example policy:
 
@@ -119,7 +119,7 @@ class PostPolicy
         return $user->is_admin;
     }
 
-    public function viewOwned(User $user): bool
+    public function viewForeign(User $user): bool
     {
         // Allow users to view models owned by others
         return $user->can('view-others-posts');
@@ -131,9 +131,9 @@ class PostPolicy
 
 ## Restrictions
 
-- `HasHoldScope` **cannot** be combined with any other traits.
+- `HasOwnershipScope` **cannot** be combined with any other traits.
 - `HasPublicScope` and `HasPrivateScope` **cannot** be used together.
-- `HasOwnScope` **requires** either `HasPublicScope` or `HasPrivateScope`.
+- `HasSelfScope` **requires** either `HasPublicScope` or `HasPrivateScope`.
 
 ---
 

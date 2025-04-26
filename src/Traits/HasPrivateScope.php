@@ -9,8 +9,8 @@ trait HasPrivateScope
     public static function bootHasPrivateScope()
     {
 
-        if (method_exists(static::class, 'bootHasHoldScope')) {
-            throw new \Exception('Cannot use HasPrivate and HasHoldScope at the same time.');
+        if (method_exists(static::class, 'bootHasOwnershipScope')) {
+            throw new \Exception('Cannot use HasPrivate and HasOwnershipScope at the same time.');
         }
 
         static::addGlobalScope(new PrivateScope);
