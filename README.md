@@ -155,10 +155,3 @@ Please see the [LICENSE.md](LICENSE.md) file for more information.
 
 Laravel Scopes help you automatically filter models by ownership or visibility status without writing repetitive query logic.  
 Combined with authorization policies, it provides flexible and secure access control at the Eloquent level.
-
----
-
----
-
-Хочешь, я ещё предложу красивую табличку в разделе "Usage Scenarios", типа "Which traits to use for which case" (схема выбора)? Было бы очень удобно для читателя. 🚀  
-(например: **Only own models → HasHoldScope**, **Public models → HasPublicScope**, и т.д.)
