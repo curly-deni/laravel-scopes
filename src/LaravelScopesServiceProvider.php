@@ -9,6 +9,12 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelScopesServiceProvider extends PackageServiceProvider
 {
+    public function boot()
+    {
+        $this->registerAbout();
+        return parent::boot();
+    }
+
 
     protected function registerAbout(): void
     {
