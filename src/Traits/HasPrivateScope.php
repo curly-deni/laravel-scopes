@@ -9,7 +9,7 @@ trait HasPrivateScope
     public static function bootHasPrivateScope()
     {
 
-        if (method_exists(static::class,'bootHasHoldScope')) {
+        if (method_exists(static::class, 'bootHasHoldScope')) {
             throw new \Exception('Cannot use HasPrivate and HasHoldScope at the same time.');
         }
 
