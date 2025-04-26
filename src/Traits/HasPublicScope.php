@@ -1,8 +1,8 @@
 <?php
 
-namespace Aesis\Scopes\LaravelScopes\Traits;
+namespace Aesis\Scopes\Traits;
 
-use Aesis\Scopes\LaravelScopes\Scopes\PublicScope;
+use Aesis\Scopes\ModelScopes\PublicScope;
 
 trait HasPublicScope
 {

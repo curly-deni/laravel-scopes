@@ -1,84 +1,164 @@
-# This is my package laravel-scopes
+# Laravel Scopes
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/curly-deni/laravel-scopes.svg?style=flat-square)](https://packagist.org/packages/curly-deni/laravel-scopes)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/curly-deni/laravel-scopes/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/curly-deni/laravel-scopes/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/curly-deni/laravel-scopes/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/curly-deni/laravel-scopes/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/curly-deni/laravel-scopes.svg?style=flat-square)](https://packagist.org/packages/curly-deni/laravel-scopes)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+**Laravel Scopes** provides a set of reusable Eloquent global scopes to control model visibility based on user ownership and public/private status.  
+It is designed for easy integration with Laravel's authorization policies.
 
-## Support us
+---
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-scopes.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-scopes)
+## Features
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+- ✅ Simple and lightweight integration
+- ✅ Reusable Eloquent scopes for ownership and visibility
+- ✅ Works seamlessly with Laravel Policies
+- ✅ No manual query building required
+- ✅ Clean separation of concerns between data and authorization
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+---
 
 ## Installation
 
-You can install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require curly-deni/laravel-scopes
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-scopes-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-scopes-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-scopes-views"
-```
+---
 
 ## Usage
 
+All traits are located under the `Aesis\Scopes\Traits` namespace and have the `Has` prefix.
+
+### Available traits
+
+- `HasHoldScope` — restricts access to models owned by the current user (`user_id` field required).
+- `HasPublicScope` — restricts access to public models (`public` field required).
+- `HasPrivateScope` — restricts access to private models (`private` field required).
+- `HasOwnScope` — allows users to see their own models in addition to public/private ones (`user_id` field required).
+
+---
+
+## Usage Scenarios
+
+### 1. Restrict models to the owner only
+
+Use `HasHoldScope` when users should only see their own models.
+
 ```php
-$laravelScopes = new Aesis\Scopes\LaravelScopes();
-echo $laravelScopes->echoPhrase('Hello, Aesis\Scopes!');
+use Aesis\Scopes\Traits\HasHoldScope;
+
+class Post extends Model
+{
+    use HasHoldScope;
+}
 ```
 
-## Testing
+---
 
-```bash
-composer test
+### 2. Restrict models based on public/private status
+
+Use `HasPublicScope` or `HasPrivateScope` to filter models by their visibility flag.  
+Optionally, add `HasOwnScope` to also allow users to see their own models.
+
+```php
+use Aesis\Scopes\Traits\HasPublicScope;
+use Aesis\Scopes\Traits\HasOwnScope;
+
+class Post extends Model
+{
+    use HasPublicScope, HasOwnScope;
+}
 ```
 
-## Changelog
+---
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+## Trait Selection Guide
 
-## Contributing
+| Use Case | Required Traits |
+|:---------|:----------------|
+| Users should see **only their own models** | `HasHoldScope` |
+| Users should see **only public models** | `HasPublicScope` |
+| Users should see **only private models** | `HasPrivateScope` |
+| Users should see **public models** and **their own private models** | `HasPublicScope` + `HasOwnScope` |
+| Users should see **private models** and **their own private models** | `HasPrivateScope` + `HasOwnScope` |
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+---
 
-## Security Vulnerabilities
+## Database Requirements
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+| Trait | Required Field |
+|:------|:---------------|
+| `HasPublicScope` | `public` |
+| `HasPrivateScope` | `private` |
+| `HasHoldScope` | `user_id` |
+| `HasOwnScope` | `user_id` |
+
+---
+
+## Policy Requirements
+
+When using scopes, you should define the following permissions in your model policies:
+
+| Method | Purpose |
+|:-------|:--------|
+| `viewPrivate(User $user)` | Allows a user to view **private models** (e.g., admins or users with special roles). |
+| `viewOwned(User $user)` | Allows a user to view **other users' models** (in addition to their own, if `HasOwnScope` is used). |
+
+Example policy:
+
+```php
+class PostPolicy
+{
+    public function viewPrivate(User $user): bool
+    {
+        // Allow access to private models for admins
+        return $user->is_admin;
+    }
+
+    public function viewOwned(User $user): bool
+    {
+        // Allow users to view models owned by others
+        return $user->can('view-others-posts');
+    }
+}
+```
+
+---
+
+## Restrictions
+
+- `HasHoldScope` **cannot** be combined with any other traits.
+- `HasPublicScope` and `HasPrivateScope` **cannot** be used together.
+- `HasOwnScope` **requires** either `HasPublicScope` or `HasPrivateScope`.
+
+---
 
 ## Credits
 
 - [Danila Mikhalev](https://github.com/curly-deni)
 - [All Contributors](../../contributors)
 
+---
+
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT).  
+Please see the [LICENSE.md](LICENSE.md) file for more information.
+
+---
+
+## Summary
+
+Laravel Scopes help you automatically filter models by ownership or visibility status without writing repetitive query logic.  
+Combined with authorization policies, it provides flexible and secure access control at the Eloquent level.
+
+---
+
+---
+
+Хочешь, я ещё предложу красивую табличку в разделе "Usage Scenarios", типа "Which traits to use for which case" (схема выбора)? Было бы очень удобно для читателя. 🚀  
+(например: **Only own models → HasHoldScope**, **Public models → HasPublicScope**, и т.д.)

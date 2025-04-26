@@ -1,8 +1,8 @@
 <?php
 
-namespace Aesis\Scopes\LaravelScopes\Traits;
+namespace Aesis\Scopes\Traits;
 
-use Aesis\Scopes\LaravelScopes\Scopes\OwnScope;
+use Aesis\Scopes\ModelScopes\OwnScope;
 
 trait HasOwnScope
 {

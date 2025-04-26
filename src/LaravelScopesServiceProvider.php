@@ -1,6 +1,6 @@
 <?php
 
-namespace Aesis\Scopes\LaravelScopes;
+namespace Aesis\Scopes;
 
 use Composer\InstalledVersions;
 use Illuminate\Foundation\Console\AboutCommand;
