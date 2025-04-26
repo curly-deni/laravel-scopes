@@ -9,11 +9,11 @@ trait HasPublicScope
     public static function bootHasPublicScope()
     {
 
-        if (function_exists('bootHasHoldScope')) {
+        if (method_exists(static::class,'bootHasHoldScope')) {
             throw new \Exception('Cannot use HasPublicScope and HasHoldScope at the same time.');
         }
 
-        if (function_exists('bootHasPrivateScope')) {
+        if (method_exists(static::class,'bootHasPrivateScope')) {
             throw new \Exception('Cannot use HasPublicScope and HasPrivateScope at the same time.');
         }
 

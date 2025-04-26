@@ -9,11 +9,11 @@ trait HasOwnScope
     public static function bootHasOwnScope()
     {
 
-        if (function_exists('bootHasHoldScope')) {
+        if (method_exists(static::class,'bootHasHoldScope')) {
             throw new \Exception('Cannot use HasOwnScope and HasHoldScope at the same time.');
         }
 
-        if (! function_exists('bootHasPrivateScope') && ! function_exists('bootHasPublicScope')) {
+        if (! method_exists(static::class,'bootHasPrivateScope') && !method_exists(static::class,'bootHasPublicScope')) {
             throw new \Exception('Cannot use HasOwnScope without HasPrivateScope or HasPublicScope.');
         }
 
